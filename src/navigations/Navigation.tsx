@@ -1,22 +1,38 @@
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import LoginPage from "../pages/LoginPage";
+import HomePage from "../pages/HomePage";
+import NewsPage from "../pages/NewsPage";
+import SignupPage from "../pages/SignupPage";
 
-export default function Navigation() {
+const Navigation = () => {
   const isAuth = useSelector((state: RootState) => state.user.isAuth);
 
   return (
-    <nav>
+    <Router>
+      <Routes>
         {isAuth ? (
           <>
-          <Link to="/">Home</Link>
-          <Link to="/news">News</Link>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/news" element={<NewsPage />} />
+            <Route path="*" element={<Navigate replace to="/" />} />
           </>
         ) : (
           <>
-        <Link to="/login">Login</Link>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="*" element={<Navigate replace to="/login" />} />
           </>
         )}
-    </nav>
+      </Routes>
+    </Router>
   );
-}
+};
+
+export default Navigation;

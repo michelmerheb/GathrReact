@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { RootState } from '../store';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
+import { RootState } from "../store";
 
 export interface User {
   message: string;
@@ -21,24 +21,24 @@ interface AuthPayload {
   token_expires_in?: string;
 }
 
-const apiBaseURL = 'https://backend-practice.euriskomobility.me'
+const apiBaseURL = import.meta.env.VITE_REACT_API_URL;
 
 export const createUser = createAsyncThunk<
   User,
   AuthPayload,
   { rejectValue: string }
->('user/create', async (userData, { rejectWithValue }) => {
+>("user/create", async (userData, { rejectWithValue }) => {
   try {
     const response = await axios.post(`${apiBaseURL}/signup`, userData);
     if (response.data) {
-      console.log('Signup successful!');
+      console.log("Signup successful!");
       return response.data;
     } else {
-      console.error('Signup failed: Invalid server response');
-      return rejectWithValue('Invalid response from server');
+      console.error("Signup failed: Invalid server response");
+      return rejectWithValue("Invalid response from server");
     }
   } catch (error: any) {
-    return rejectWithValue('User already exists');
+    return rejectWithValue("User already exists");
   }
 });
 
@@ -46,18 +46,18 @@ export const loginUser = createAsyncThunk<
   User,
   AuthPayload,
   { rejectValue: string }
->('user/login', async (loginData, { rejectWithValue }) => {
+>("user/login", async (loginData, { rejectWithValue }) => {
   try {
     const response = await axios.post(`${apiBaseURL}/login`, loginData);
     if (response.data) {
-      console.log('Login successful');
+      console.log("Login successful");
       return response.data;
     } else {
-      console.error('Login failed: Invalid server response');
-      return rejectWithValue('Invalid response from server');
+      console.error("Login failed: Invalid server response");
+      return rejectWithValue("Invalid response from server");
     }
   } catch (error: any) {
-    return rejectWithValue('Incorrect email or password');
+    return rejectWithValue("Incorrect email or password");
   }
 });
 
@@ -65,25 +65,25 @@ export const refreshToken = createAsyncThunk<
   User,
   { refreshToken: string },
   { state: RootState; rejectValue: string }
->('user/refresh', async ({ refreshToken }, { rejectWithValue }) => {
+>("user/refresh", async ({ refreshToken }, { rejectWithValue }) => {
   try {
     const response = await axios.post(`${apiBaseURL}/refresh-token`, {
       refreshToken,
-      token_expires_in: '30m',
+      token_expires_in: "30m",
     });
     if (response.data && response.data.accessToken) {
-      console.log('Token refresh successful');
+      console.log("Token refresh successful");
       return {
-        message: 'Token refreshed successfully',
+        message: "Token refreshed successfully",
         accessToken: response.data.accessToken,
         refreshToken: response.data.refreshToken,
       };
     } else {
-      console.error('Token refresh failed: Invalid server response');
-      return rejectWithValue('Invalid response from server');
+      console.error("Token refresh failed: Invalid server response");
+      return rejectWithValue("Invalid response from server");
     }
   } catch (error: any) {
-    return rejectWithValue(error.response?.data || 'Network error');
+    return rejectWithValue(error.response?.data || "Network error");
   }
 });
 
@@ -95,30 +95,32 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
-    logout: state => {
+    logout: (state) => {
       state.user = null;
       state.isAuth = false;
     },
     setAuthStatus: (state, action: PayloadAction<boolean>) => {
       state.isAuth = action.payload;
     },
-    clearError: state => {
+    clearError: (state) => {
       state.error = null;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(createUser.pending, state => {
+      .addCase(createUser.pending, (state) => {
         state.loading = true;
       })
       .addCase(createUser.fulfilled, (state, action: PayloadAction<User>) => {
         state.user = action.payload;
         state.isAuth = true;
         state.loading = false;
-        axios.defaults.headers.common['Authorization'] = `Bearer ${action.payload.accessToken}`;
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${action.payload.accessToken}`;
       })
       .addCase(
         createUser.rejected,
@@ -126,9 +128,9 @@ const userSlice = createSlice({
           state.error = action.payload;
           state.loading = false;
           state.isAuth = false;
-        },
+        }
       )
-      .addCase(loginUser.pending, state => {
+      .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -144,7 +146,7 @@ const userSlice = createSlice({
           state.error = action.payload;
           state.loading = false;
           state.isAuth = false;
-        },
+        }
       )
       .addCase(refreshToken.fulfilled, (state, action: PayloadAction<User>) => {
         state.user = action.payload;
@@ -155,7 +157,7 @@ const userSlice = createSlice({
         (state, action: PayloadAction<string | null | undefined>) => {
           state.error = action.payload;
           state.isAuth = false;
-        },
+        }
       );
   },
 });
