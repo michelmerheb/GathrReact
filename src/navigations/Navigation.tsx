@@ -11,6 +11,7 @@ import HomePage from "../pages/HomePage";
 import NewsPage from "../pages/NewsPage";
 import SignupPage from "../pages/SignupPage";
 import AboutUsPage from "../pages/AboutUsPage";
+import Settings from "../pages/SettingsPage";
 
 const Navigation = () => {
   const isAuth = useSelector((state: RootState) => state.user.isAuth);
@@ -23,6 +24,7 @@ const Navigation = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/aboutus" element={<AboutUsPage />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate replace to="/" />} />
           </>
         ) : (

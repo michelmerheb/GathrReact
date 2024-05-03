@@ -19,7 +19,7 @@ const LogoutIcon = () => {
         onClick={() => setShowModal(true)}
         className="p-2 rounded-full hover:bg-gray-200"
       >
-        <ArrowLeftStartOnRectangleIcon className="h-6 w-6 text-gray-800" />
+        <ArrowLeftStartOnRectangleIcon className="h-7 w-7 text-gray-800 hover:text-purple-600" />
       </button>
       <Modal
         isOpen={showModal}
