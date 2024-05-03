@@ -23,6 +23,16 @@ interface AuthPayload {
 
 const apiBaseURL = import.meta.env.VITE_REACT_API_URL;
 
+const saveTokens = (tokens: { accessToken: string; refreshToken: string }) => {
+  localStorage.setItem("accessToken", tokens.accessToken);
+  localStorage.setItem("refreshToken", tokens.refreshToken);
+};
+
+const clearTokens = () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+};
+
 export const createUser = createAsyncThunk<
   User,
   AuthPayload,
@@ -32,6 +42,10 @@ export const createUser = createAsyncThunk<
     const response = await axios.post(`${apiBaseURL}/signup`, userData);
     if (response.data) {
       console.log("Signup successful!");
+      saveTokens({
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+      });
       return response.data;
     } else {
       console.error("Signup failed: Invalid server response");
@@ -51,6 +65,10 @@ export const loginUser = createAsyncThunk<
     const response = await axios.post(`${apiBaseURL}/login`, loginData);
     if (response.data) {
       console.log("Login successful");
+      saveTokens({
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+      });
       return response.data;
     } else {
       console.error("Login failed: Invalid server response");
@@ -73,6 +91,10 @@ export const refreshToken = createAsyncThunk<
     });
     if (response.data && response.data.accessToken) {
       console.log("Token refresh successful");
+      saveTokens({
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+      });
       return {
         message: "Token refreshed successfully",
         accessToken: response.data.accessToken,
@@ -87,18 +109,34 @@ export const refreshToken = createAsyncThunk<
   }
 });
 
-const initialState: UserState = {
-  user: null,
-  loading: false,
-  error: null,
-  isAuth: false,
+const loadInitialState = () => {
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (accessToken && refreshToken) {
+    return {
+      user: { message: "", accessToken, refreshToken },
+      loading: false,
+      error: null,
+      isAuth: true,
+    };
+  } else {
+    return {
+      user: null,
+      loading: false,
+      error: null,
+      isAuth: false,
+    };
+  }
 };
+
+const initialState: UserState = loadInitialState();
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
     logout: (state) => {
+      clearTokens();
       state.user = null;
       state.isAuth = false;
     },
