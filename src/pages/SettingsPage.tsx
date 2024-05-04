@@ -1,54 +1,61 @@
-import { useState } from "react";
 import Header from "../components/Header";
 
+interface OptionsProps {
+  title: string;
+  description: string;
+}
+
+const SettingsOption = ({ title, description }: OptionsProps) => (
+  <div className="py-2">
+    <h2 className="text-lg text-gray-800 hover:text-purple-600 cursor-pointer">
+      {title}
+    </h2>
+    <p className="text-gray-600">{description}</p>
+    <hr className="my-2" />
+  </div>
+);
+
 export default function Settings() {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(false);
-
-  const handleEmailNotificationChange = () => {
-    setEmailNotifications(!emailNotifications);
-  };
-
-  const handlePushNotificationChange = () => {
-    setPushNotifications(!pushNotifications);
-  };
-
   return (
-    <div className="min-w-screen min-h-screen bg-gradient-to-bl from-purple-900 via-purple-500 to-rose-900 text-white">
+    <div className="min-w-screen min-h-screen bg-gradient-to-bl from-purple-900 via-purple-500 to-rose-900">
       <Header />
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold">Notifications</h2>
+      <div className="p-5">
+        <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+          <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
           <div className="mt-4">
-            <label
-              htmlFor="email-notifications"
-              className="flex items-center cursor-pointer"
-            >
-              <input
-                id="email-notifications"
-                type="checkbox"
-                checked={emailNotifications}
-                onChange={handleEmailNotificationChange}
-                className="form-checkbox h-5 w-5 text-purple-300 focus:ring-purple-500 border-none"
-              />
-              <span className="ml-3 text-lg">Email Notifications</span>
-            </label>
+            <SettingsOption
+              title="Account"
+              description="Change your email, username"
+            />
+            <SettingsOption
+              title="Notifications"
+              description="Manage notifications settings"
+            />
+            <SettingsOption
+              title="Privacy"
+              description="Adjust your privacy settings"
+            />
+            <SettingsOption
+              title="Security"
+              description="Change password, enable 2FA"
+            />
+            <SettingsOption
+              title="Theme"
+              description="Choose between Light and Dark Theme"
+            />
           </div>
-          <div className="mt-2">
-            <label
-              htmlFor="push-notifications"
-              className="flex items-center cursor-pointer"
-            >
-              <input
-                id="push-notifications"
-                type="checkbox"
-                checked={pushNotifications}
-                onChange={handlePushNotificationChange}
-                className="form-checkbox h-5 w-5 text-purple-300 focus:ring-purple-500 border-none"
-              />
-              <span className="ml-3 text-lg">Push Notifications</span>
-            </label>
+        </div>
+        <div className="w-full bg-white rounded-lg shadow-md p-4">
+          <h1 className="text-xl font-semibold text-gray-800">More</h1>
+          <div className="mt-4">
+            <SettingsOption
+              title="Help & Support"
+              description="Get help and find answers"
+            />
+            <SettingsOption
+              title="Terms and Conditions"
+              description="Read and agree on Terms and Conditions"
+            />
           </div>
         </div>
       </div>
