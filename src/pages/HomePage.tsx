@@ -20,6 +20,10 @@ export default function HomePage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   useEffect(() => {
+    document.title = "Gathr- Events";
+  });
+
+  useEffect(() => {
     fetchData();
   }, []);
 

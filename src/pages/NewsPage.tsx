@@ -16,6 +16,10 @@ export default function NewsPage() {
   const pageSize = 25;
 
   useEffect(() => {
+    document.title = "Gathr- News";
+  });
+
+  useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 

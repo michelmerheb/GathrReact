@@ -5,19 +5,39 @@ import { RootState, AppDispatch } from "../redux/store";
 import { Link } from "react-router-dom";
 import backgroundImage from "../assets/bgImage.png";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/16/solid";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const error = useSelector((state: RootState) => state.user.error);
+
+  useEffect(() => {
+    document.title = "Gathr- Login";
+  });
 
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
+
   const handleLogin = (event: any) => {
     event.preventDefault();
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+    setEmailError(null);
     dispatch(loginUser({ email, password, token_expires_in: "15m" }));
   };
 
@@ -49,8 +69,9 @@ export default function LoginPage() {
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
             />
+            {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
           </div>
           <div className="mb-6 relative">
             <label

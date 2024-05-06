@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
-import type { User } from "./UserSlice";
+import type { Token } from "./UserSlice";
 
 interface PostState {
   posts: any[];
@@ -23,7 +23,7 @@ export const fetchPosts = createAsyncThunk<
   { state: RootState; rejectValue: string }
 >("user/fetchPosts", async ({ page }, { getState, rejectWithValue }) => {
   try {
-    const accessToken = (getState().user.user as User).accessToken;
+    const accessToken = (getState().user.user as Token).accessToken;
     const response = await axios.get(`${apiBaseURL}/posts`, {
       headers: { Authorization: `Bearer ${accessToken}` },
       params: { page, pageSize: 15 },
@@ -38,7 +38,7 @@ export const fetchPosts = createAsyncThunk<
       return rejectWithValue("No data received from server");
     }
   } catch (error: any) {
-    return rejectWithValue(error.response?.data || "Failed to fetch posts");
+    return rejectWithValue("Failed to fetch posts");
   }
 });
 

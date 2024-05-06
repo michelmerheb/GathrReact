@@ -2,17 +2,16 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
 
-export interface User {
-  message: string;
-  accessToken: string;
-  refreshToken: string;
-}
-
 interface UserState {
-  user: User | null;
+  user: Token | null;
   loading: boolean;
   error: string | null | undefined;
   isAuth: boolean;
+}
+
+export interface Token {
+  accessToken: string;
+  refreshToken: string;
 }
 
 interface AuthPayload {
@@ -34,7 +33,7 @@ const clearTokens = () => {
 };
 
 export const createUser = createAsyncThunk<
-  User,
+  Token,
   AuthPayload,
   { rejectValue: string }
 >("user/create", async (userData, { rejectWithValue }) => {
@@ -48,8 +47,7 @@ export const createUser = createAsyncThunk<
       });
       return response.data;
     } else {
-      console.error("Signup failed: Invalid server response");
-      return rejectWithValue("Invalid response from server");
+      return rejectWithValue("Invalid response from server, please refresh!");
     }
   } catch (error: any) {
     return rejectWithValue("User already exists");
@@ -57,7 +55,7 @@ export const createUser = createAsyncThunk<
 });
 
 export const loginUser = createAsyncThunk<
-  User,
+  Token,
   AuthPayload,
   { rejectValue: string }
 >("user/login", async (loginData, { rejectWithValue }) => {
@@ -71,8 +69,7 @@ export const loginUser = createAsyncThunk<
       });
       return response.data;
     } else {
-      console.error("Login failed: Invalid server response");
-      return rejectWithValue("Invalid response from server");
+      return rejectWithValue("Invalid response from server, please refresh!");
     }
   } catch (error: any) {
     return rejectWithValue("Incorrect email or password");
@@ -80,7 +77,7 @@ export const loginUser = createAsyncThunk<
 });
 
 export const refreshToken = createAsyncThunk<
-  User,
+  Token,
   { refreshToken: string },
   { state: RootState; rejectValue: string }
 >("user/refresh", async ({ refreshToken }, { rejectWithValue }) => {
@@ -96,16 +93,14 @@ export const refreshToken = createAsyncThunk<
         refreshToken: response.data.refreshToken,
       });
       return {
-        message: "Token refreshed successfully",
         accessToken: response.data.accessToken,
         refreshToken: response.data.refreshToken,
       };
     } else {
-      console.error("Token refresh failed: Invalid server response");
       return rejectWithValue("Invalid response from server");
     }
   } catch (error: any) {
-    return rejectWithValue(error.response?.data || "Network error");
+    return rejectWithValue("Network error");
   }
 });
 
@@ -114,7 +109,7 @@ const loadInitialState = () => {
   const refreshToken = localStorage.getItem("refreshToken");
   if (accessToken && refreshToken) {
     return {
-      user: { message: "", accessToken, refreshToken },
+      user: { accessToken, refreshToken },
       loading: false,
       error: null,
       isAuth: true,
@@ -140,9 +135,6 @@ const userSlice = createSlice({
       state.user = null;
       state.isAuth = false;
     },
-    setAuthStatus: (state, action: PayloadAction<boolean>) => {
-      state.isAuth = action.payload;
-    },
     clearError: (state) => {
       state.error = null;
     },
@@ -152,13 +144,10 @@ const userSlice = createSlice({
       .addCase(createUser.pending, (state) => {
         state.loading = true;
       })
-      .addCase(createUser.fulfilled, (state, action: PayloadAction<User>) => {
+      .addCase(createUser.fulfilled, (state, action: PayloadAction<Token>) => {
         state.user = action.payload;
         state.isAuth = true;
         state.loading = false;
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${action.payload.accessToken}`;
       })
       .addCase(
         createUser.rejected,
@@ -170,13 +159,11 @@ const userSlice = createSlice({
       )
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action: PayloadAction<User>) => {
+      .addCase(loginUser.fulfilled, (state, action: PayloadAction<Token>) => {
         state.user = action.payload;
         state.isAuth = true;
         state.loading = false;
-        state.error = null;
       })
       .addCase(
         loginUser.rejected,
@@ -186,10 +173,13 @@ const userSlice = createSlice({
           state.isAuth = false;
         }
       )
-      .addCase(refreshToken.fulfilled, (state, action: PayloadAction<User>) => {
-        state.user = action.payload;
-        state.isAuth = true;
-      })
+      .addCase(
+        refreshToken.fulfilled,
+        (state, action: PayloadAction<Token>) => {
+          state.user = action.payload;
+          state.isAuth = true;
+        }
+      )
       .addCase(
         refreshToken.rejected,
         (state, action: PayloadAction<string | null | undefined>) => {
@@ -200,5 +190,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { logout, setAuthStatus, clearError } = userSlice.actions;
+export const { logout, clearError } = userSlice.actions;
 export default userSlice.reducer;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../redux/store";
 import { createUser, clearError } from "../redux/Slices/UserSlice";
 import backgroundImage from "../assets/bgImage.png";
 import { Link } from "react-router-dom";
@@ -10,23 +10,45 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const [errorMessage, setErrorMessage] = useState("");
+  const error = useSelector((state: RootState) => state.user.error);
+
+  useEffect(() => {
+    document.title = "Gathr- Sign Up";
+  });
 
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
+
   const handleSignup = (event: any) => {
     event.preventDefault();
+
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
-    } else {
-      dispatch(createUser({ email, password }));
-      setErrorMessage("");
+      return;
     }
+    setEmailError(null);
+    setErrorMessage("");
+    dispatch(createUser({ email, password }));
   };
 
   const togglePassword = () => {
@@ -61,8 +83,9 @@ export default function SignupPage() {
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
             />
+            {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
           </div>
           <div className="mb-4 relative">
             <label
@@ -120,6 +143,7 @@ export default function SignupPage() {
               )}
             </button>
           </div>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           {errorMessage && (
             <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
           )}

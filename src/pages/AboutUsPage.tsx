@@ -1,7 +1,11 @@
+import { useEffect } from "react";
 import Header from "../components/Header";
 import FooterComponent from "../components/Footer";
 
 export default function AboutUsPage() {
+  useEffect(() => {
+    document.title = "Gathr- About Us";
+  });
   return (
     <div className="min-w-screen min-h-screen bg-gradient-to-bl from-purple-900 via-purple-500 to-rose-900">
       <Header />
