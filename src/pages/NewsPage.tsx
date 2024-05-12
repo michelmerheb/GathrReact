@@ -46,7 +46,7 @@ export default function NewsPage() {
   };
 
   return (
-    <div className="min-w-screen min-h-screen bg-gradient-to-bl from-purple-900 via-purple-500 to-rose-900">
+    <div className="min-w-screen min-h-screen overflow-hidden bg-gradient-to-bl from-purple-900 via-purple-500 to-rose-900">
       <Header />
       <h1 className="flex text-center justify-center mt-10 text-white font-bold text-3xl">
         GATHR for the Top News of Today
