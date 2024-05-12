@@ -40,7 +40,6 @@ export const createUser = createAsyncThunk<
   try {
     const response = await axios.post(`${apiBaseURL}/signup`, userData);
     if (response.data) {
-      console.log("Signup successful!");
       saveTokens({
         accessToken: response.data.accessToken,
         refreshToken: response.data.refreshToken,
@@ -62,7 +61,6 @@ export const loginUser = createAsyncThunk<
   try {
     const response = await axios.post(`${apiBaseURL}/login`, loginData);
     if (response.data) {
-      console.log("Login successful");
       saveTokens({
         accessToken: response.data.accessToken,
         refreshToken: response.data.refreshToken,
@@ -87,7 +85,6 @@ export const refreshToken = createAsyncThunk<
       token_expires_in: "30m",
     });
     if (response.data && response.data.accessToken) {
-      console.log("Token refresh successful");
       saveTokens({
         accessToken: response.data.accessToken,
         refreshToken: response.data.refreshToken,
